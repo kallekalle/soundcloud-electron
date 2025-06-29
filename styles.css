@@ -1,0 +1,11 @@
+body {
+  margin: 0;
+}
+.titlebar {
+  height: 30px;
+  background: #121212;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  app-region: drag;
+}
