@@ -13,5 +13,5 @@ After ❤️‍🩹
 ### 2. Scroll bar and title bar have been removed
 
 ### 3. Doesn't actually use as many system resources as you might fear
-Compared to Spotify
+Compared to Spotify  
 ![{D7B7DFBA-9DFD-4A2A-832F-F12FA6740C67}](https://github.com/user-attachments/assets/54bcf056-e1e7-4f32-96a2-769d1b8f644b)
