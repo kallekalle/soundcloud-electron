@@ -2,7 +2,7 @@
 SoundCloud wrapper for Windows made with Electron
 
 ## "Features"?
-### 1. The upsell banners ("Upgrade now!" etc..) have been removed
+### 1. The upsell banners have been removed
 #### Before 💔
 
 ![image](https://github.com/user-attachments/assets/be15f497-ab3a-4186-ab0d-e42b3afd33d1)
