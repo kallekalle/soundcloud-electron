@@ -1,5 +1,7 @@
-const { app, BrowserWindow, BrowserView, Menu } = require('electron');
+const { app, BrowserWindow, BrowserView, Menu, Tray} = require('electron');
 const path = require('path');
+
+let tray = null;
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -62,6 +64,33 @@ function createWindow() {
       subtree: true
     });
   `);
+  });
+
+  createTray(win);
+}
+
+function createTray(win) {
+  const iconPath = path.join(__dirname, './icon.ico');
+
+  tray = new Tray(iconPath);
+
+  const contextMenu = Menu.buildFromTemplate([
+    { label: 'Show App', click: () => { win.show(); } },
+    { label: 'Hide App', click: () => { win.hide(); } },
+    { type: 'separator' },
+    { label: 'Quit', click: () => { app.quit(); } }
+  ]);
+
+  tray.setToolTip('Soundcloud Electron');
+  tray.setContextMenu(contextMenu);
+
+  // Double-click on tray icon to show/hide the window
+  tray.on('double-click', () => {
+    if (win.isVisible()) {
+      win.hide();
+    } else {
+      win.show();
+    }
   });
 }
 
