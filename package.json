@@ -10,11 +10,11 @@
   ],
   "win": {
     "sign": false,
-    "target": "portable",
+    "target": "nsis",
     "arch": "x64",
     "icon": "icon.ico"
   },
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
