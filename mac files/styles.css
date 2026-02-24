@@ -1,0 +1,49 @@
+body {
+  background: #121212;
+  margin: 0;
+}
+
+.titlebar {
+  height: 31px;
+  background: #121212;
+  display: flex;
+  align-items: center;
+  -webkit-app-region: drag;
+}
+
+#toolbar {
+  display: flex;
+  gap: 8px;
+  padding: 0 10px;
+  margin-left: auto;
+}
+
+#toolbar button {
+  all: unset;
+  padding: 14px;
+  padding-top: 28px;
+  height: 22px;
+  -webkit-app-region: no-drag;
+}
+
+.icon-btn img {
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+}
+
+/* Pressed */
+.icon-btn:active img {
+  filter: brightness(0.7);
+}
+
+#topblock {
+  display: flex;
+  background-color: #121212;
+  height: 20px;
+}
+
+body {
+  margin: 0;
+  background: #121212;
+}
