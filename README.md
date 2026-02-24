@@ -21,6 +21,7 @@ SoundCloud wrapper for Windows made with Electron
 <br>
 <img width="142" height="93" alt="image" src="https://github.com/user-attachments/assets/59c5100c-4519-450a-b3c7-1c5aada2e6d1" />
 <br>
+<i><sub>btw.. double-click the tray icon to show/hide the app</sub></i>
 <br>
 
 ### 3. Relatively moderate system resource consumption
