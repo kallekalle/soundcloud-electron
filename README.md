@@ -4,7 +4,7 @@ SoundCloud wrapper for Windows made with Electron
 ## Features
 ### 1. Removes UI clutter
 
-- Removes upsell banners and ads, ugly title bars, unnecessary scroll bars, 
+- Removes upsell banners and ads, ugly title bars and unnecessary scroll bars, 
 
 #### Before 💔
 
