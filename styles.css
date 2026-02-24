@@ -4,7 +4,7 @@ body {
 }
 
 .titlebar {
-  height: 30px;
+  height: 31px;
   background: #121212;
   display: flex;
   align-items: center;
@@ -34,4 +34,15 @@ body {
 /* Pressed */
 .icon-btn:active img {
   filter: brightness(0.7);
+}
+
+#topblock {
+  display: flex;
+  background-color: #121212;
+  height: 20px;
+}
+
+body {
+  margin: 0;
+  background: #121212;
 }
