@@ -1,35 +1,33 @@
 # SoundCloud Electron
-SoundCloud wrapper for Windows made with Electron
+SoundCloud wrapper for Windows and Mac made with Electron
+
+<img width="1320" height="876" alt="skygge3" src="https://github.com/user-attachments/assets/9a078094-417c-4263-a257-1ca61f2c07fe" />
+
+
 
 ## Features
 ### 1. Removes UI clutter
 
 - Removes upsell banners and ads, ugly title bars and unnecessary scroll bars
 
-#### Before 💔
-
-![image](https://github.com/user-attachments/assets/be15f497-ab3a-4186-ab0d-e42b3afd33d1)
-
-#### After ❤️‍🩹
-
-![{128CFAF2-820F-4717-8DB2-838C310B2EA7}](https://github.com/user-attachments/assets/9f08101a-08ef-4c21-acc1-2e63ef0921bc)
+<img width="1298" height="752" alt="skygge4" src="https://github.com/user-attachments/assets/c1fd7e0d-2c6d-4a36-b01f-082eecd18f63" />
 
 
 ### 2. Added functionality
 - Navigation buttons, system tray functions, Discord Rich Presence and much more ↔️💻👾
-<img width="234" height="132" alt="image" src="https://github.com/user-attachments/assets/aa879676-30b6-4c42-9c81-6fc73f4d44c6" />
+<img width="257" height="145" alt="skygge5" src="https://github.com/user-attachments/assets/ad6bbd5a-d27b-49a9-a198-0fee1eb08448" />
 <br>
-<img width="520" height="374" alt="558269326-42e303c2-a713-4c3f-abf0-55e433b0fe54" src="https://github.com/user-attachments/assets/f39aeebb-675f-4d5e-9210-793c2231d78b" />
+<img width="572" height="411" alt="skygge6" src="https://github.com/user-attachments/assets/87f6e288-d36e-42bc-a015-da9275f8bd44" />
+
 
 
 ### 3. Built in tracker- and ad blocker ⛔
 
-<img width="645" height="193" alt="SoundCloud_Electron_PMU3k05d7S" src="https://github.com/user-attachments/assets/bd6be59a-26cc-4539-a9e4-dbed03cfb19d" />
+<img width="709" height="232" alt="skygge7" src="https://github.com/user-attachments/assets/773f3ccd-558a-4343-9bed-af30b5560c4c" />
 
 <br>
 
 ### 4. Relatively moderate system resource consumption
 Compared to Spotify:  
 
-![{D7B7DFBA-9DFD-4A2A-832F-F12FA6740C67}](https://github.com/user-attachments/assets/54bcf056-e1e7-4f32-96a2-769d1b8f644b)
-
+<img width="562" height="110" alt="skygge8" src="https://github.com/user-attachments/assets/6dc57973-86db-4728-bb7d-7bd2280b6307" />
