@@ -46,8 +46,8 @@ app.on('before-quit', () => {
 function createWindow() {
   win = new BrowserWindow({
     width: 1200,
-    height: 800,
-    minWidth: 1000,
+    height: 796,
+    minWidth: 800,
     minHeight: 600,
     titleBarStyle: 'hidden',
     ...(process.platform !== 'darwin' ? {
