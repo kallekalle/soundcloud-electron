@@ -31,3 +31,8 @@ SoundCloud wrapper for Windows and Mac made with Electron
 Compared to Spotify:  
 
 <img width="562" height="110" alt="skygge8" src="https://github.com/user-attachments/assets/6dc57973-86db-4728-bb7d-7bd2280b6307" />
+
+
+### 5. How to install 📦
+
+Download the latest version from the [releases](https://github.com/kallekalle/soundcloud-electron/releases) tab!
