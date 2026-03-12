@@ -15,8 +15,8 @@ SoundCloud wrapper for Windows and Mac made with Electron
 
 ### 2. Added functionality ✅
 - Navigation buttons, system tray functions, Discord Rich Presence and much more ↔️💻👾
-<img width="572" height="411" alt="skygge6" src="https://github.com/user-attachments/assets/87f6e288-d36e-42bc-a015-da9275f8bd44" />
-<img width="398" height="494" alt="skygge9" src="https://github.com/user-attachments/assets/d07af813-d53c-4fca-a77b-1a3d3a6a2ab7" />
+<img width="1024" height="447" alt="skygge10" src="https://github.com/user-attachments/assets/34d6cfd8-0072-4131-9016-c4bba28bbed8" />
+
 
 
 ### 3. Built in tracker- and ad blocker ⛔
