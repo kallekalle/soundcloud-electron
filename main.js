@@ -38,6 +38,29 @@ let currentTrackName = '';
 
 app.isQuitting = false;
 
+const gotSingleInstanceLock = app.requestSingleInstanceLock();
+if (!gotSingleInstanceLock) {
+  app.quit();
+}
+
+function bringMainWindowToFront() {
+  if (!win || win.isDestroyed()) return;
+
+  if (win.isMinimized()) {
+    win.restore();
+  }
+
+  if (!win.isVisible()) {
+    win.show();
+  }
+
+  win.focus();
+}
+
+app.on('second-instance', () => {
+  bringMainWindowToFront();
+});
+
 app.on('before-quit', () => {
   app.isQuitting = true;
   cleanup();
@@ -127,11 +150,14 @@ function createWindow() {
         '.l-product-banners.l-inner-fullwidth',
         'div.trackMonetizationSidebarUpsell.sc-background-light.sc-pt-5x.sc-pb-2x.sc-px-2x.sc-mb-3x.sc-mx-1x',
         'div.quotaMeterWrapper',
-        'div.sidebarModule',
         'article.sidebarModule.g-all-transitions-200-linear.mobileApps'
       ];
       selectors.forEach(sel => {
         document.querySelectorAll(sel).forEach(el => el.remove());
+      });
+
+      document.querySelectorAll('div.sidebarModule').forEach(el => {
+        el.style.display = 'none';
       });
     };
 
