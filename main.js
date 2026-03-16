@@ -38,6 +38,29 @@ let currentTrackName = '';
 
 app.isQuitting = false;
 
+const gotSingleInstanceLock = app.requestSingleInstanceLock();
+if (!gotSingleInstanceLock) {
+  app.quit();
+}
+
+function bringMainWindowToFront() {
+  if (!win || win.isDestroyed()) return;
+
+  if (win.isMinimized()) {
+    win.restore();
+  }
+
+  if (!win.isVisible()) {
+    win.show();
+  }
+
+  win.focus();
+}
+
+app.on('second-instance', () => {
+  bringMainWindowToFront();
+});
+
 app.on('before-quit', () => {
   app.isQuitting = true;
   cleanup();
