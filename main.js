@@ -215,7 +215,6 @@ function registerGlobalShortcuts() {
 }
 
 function connectDiscordRPC() {
-  if (!store.get('discordRpcEnabled') || DISCORD_CLIENT_ID === 'YOUR_CLIENT_ID_HERE') return;
   if (rpcConnected) return;
 
   try {
@@ -592,11 +591,12 @@ function cleanup() {
 
   if (rpcReconnectTimeout) {
     clearTimeout(rpcReconnectTimeout);
-    rpcReconnectTimeout = null;
+    rpcReconnectTimeout = 10000;
   }
 
   if (rpcConnected) {
     try {
+      rpc.clearActivity();
       rpc.destroy();
       rpcConnected = false;
     } catch (err) { }
