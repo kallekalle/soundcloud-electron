@@ -10,28 +10,27 @@
 <body>
   <div class="titlebar">
     <div id="toolbar">
-      <button id="back" class="icon-btn" onclick="window.nav.back()">
+      <button id="back" class="icon-btn" onclick="window.electronAPI.nav.back()">
         <img src="assets/backbutton.png">
       </button>
-      <button id="forward" class="icon-btn" onclick="window.nav.forward()">
+      <button id="forward" class="icon-btn" onclick="window.electronAPI.nav.forward()">
         <img src="assets/forwardbutton.png">
       </button>
-      <button class="icon-btn" onclick="window.nav.reload()">
+      <button class="icon-btn" onclick="window.electronAPI.nav.reload()">
         <img src="assets/refreshbutton.png">
       </button>
+      <button id="genius-toggle" class="genius-btn" type="button">Genius</button>
     </div>
   </div>
   <div id="topblock"></div>
-  <!--
-  <div id="chrome">
-    <div class="side left"></div>
-    <div id="content">
-    </div>
-    <div class="side right"></div>
-  </div>
-  -->
+
+  <script>
+    const geniusToggleButton = document.getElementById('genius-toggle');
+
+    geniusToggleButton.addEventListener('click', () => {
+      window.electronAPI.toggleGeniusWindow();
+    });
+  </script>
 </body>
 
 </html>
-
-<button></button>

@@ -1,6 +1,8 @@
 body {
   background: #121212;
   margin: 0;
+  color: #f2f2f2;
+  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
 }
 
 .titlebar {
@@ -15,6 +17,7 @@ body {
   display: flex;
   gap: 8px;
   padding: 0 10px;
+  align-items: center;
 }
 
 #toolbar button {
@@ -36,6 +39,31 @@ body {
   filter: brightness(0.7);
 }
 
+.genius-btn {
+  all: unset;
+  -webkit-app-region: no-drag;
+  background: linear-gradient(135deg, #ff6a00, #ff5500);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.4px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  margin-top: 14px;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(255, 85, 0, 0.3);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.genius-btn:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+.genius-btn:active {
+  transform: translateY(0);
+}
+
 #topblock {
   display: flex;
   background-color: #121212;
@@ -45,4 +73,94 @@ body {
 body {
   margin: 0;
   background: #121212;
+}
+
+.genius-modal {
+  position: fixed;
+  top: 44px;
+  left: 12px;
+  width: 420px;
+  height: 470px;
+  z-index: 200;
+  display: none;
+  -webkit-app-region: no-drag;
+}
+
+.genius-modal.is-open {
+  display: block;
+}
+
+.genius-modal__panel {
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  border: 1px solid #2a2a2a;
+  background: #181818;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.genius-modal__panel h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  color: #f3f3f3;
+}
+
+.genius-modal__panel label {
+  font-size: 12px;
+  color: #cccccc;
+}
+
+.genius-modal__panel input {
+  background: #101010;
+  border: 1px solid #303030;
+  color: #f5f5f5;
+  border-radius: 10px;
+  padding: 10px 12px;
+  outline: none;
+}
+
+.genius-modal__panel input:focus {
+  border-color: #ff5500;
+  box-shadow: 0 0 0 2px rgba(255, 85, 0, 0.25);
+}
+
+#genius-search {
+  all: unset;
+  text-align: center;
+  background: #ff5500;
+  color: #ffffff;
+  border-radius: 10px;
+  padding: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#genius-search:hover {
+  filter: brightness(1.08);
+}
+
+.genius-result {
+  margin-top: 2px;
+  flex: 1;
+  background: #0f0f0f;
+  border: 1px solid #2c2c2c;
+  border-radius: 10px;
+  padding: 12px;
+  white-space: pre-wrap;
+  overflow-y: auto;
+  color: #dedede;
+  line-height: 1.45;
+}
+
+.genius-result::-webkit-scrollbar {
+  width: 8px;
+}
+
+.genius-result::-webkit-scrollbar-thumb {
+  background: #323232;
+  border-radius: 8px;
 }
