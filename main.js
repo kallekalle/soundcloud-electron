@@ -75,11 +75,11 @@ function createWindow() {
     titleBarStyle: 'hidden',
     ...(process.platform !== 'darwin'
       ? {
-          titleBarOverlay: {
-            color: '#121212',
-            symbolColor: '#CCCCCC'
-          }
+        titleBarOverlay: {
+          color: '#121212',
+          symbolColor: '#CCCCCC'
         }
+      }
       : {}),
     icon: 'assets/icon.ico',
     webPreferences: {
@@ -138,6 +138,10 @@ function createWindow() {
     if (view && !view.webContents.isDestroyed()) {
       view.webContents.reload();
     }
+  });
+
+  ipcMain.handle('genius:get-track-data', () => {
+    return currentTrack;
   });
 
   ipcMain.handle('genius:toggle-window', () => {
@@ -223,7 +227,7 @@ function executeMediaControl(selectorList) {
     })();
   `;
 
-  view.webContents.executeJavaScript(js).catch(() => {});
+  view.webContents.executeJavaScript(js).catch(() => { });
 }
 
 function registerGlobalShortcuts() {
@@ -291,7 +295,7 @@ function updateDiscordPresence(trackData) {
   }
 
   try {
-    Promise.resolve(rpc.setActivity(activity)).catch(() => {});
+    Promise.resolve(rpc.setActivity(activity)).catch(() => { });
   } catch (err) {
     // ignore transport issues when Discord is unavailable
   }
@@ -317,208 +321,6 @@ rpc.on('disconnected', () => {
     rpcReconnectTimeout = setTimeout(connectDiscordRPC, 10000);
   }
 });
-
-function getGeniusWindowHtml() {
-  return `<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <title>Genius Lyrics</title>
-  <style>
-    :root {
-      color-scheme: dark;
-    }
-    * {
-      box-sizing: border-box;
-      font-family: "Segoe UI", "Helvetica Neue", sans-serif;
-    }
-    body {
-      margin: 0;
-      background: rgba(18, 18, 18, 0.95);
-      color: #f2f2f2;
-      border: 1px solid #2b2b2b;
-      border-radius: 14px;
-      overflow: hidden;
-    }
-    @keyframes slideIn {
-      from {
-        transform: translateX(-100%);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-    @keyframes slideOut {
-      from {
-        transform: translateX(0);
-        opacity: 1;
-      }
-      to {
-        transform: translateX(-100%);
-        opacity: 0;
-      }
-    }
-    .wrap {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      padding: 14px;
-      transform: translateX(-100%);
-      opacity: 0;
-      animation: slideIn 0.3s ease-out forwards;
-    }
-    .wrap.slide-out {
-      animation: slideOut 0.22s ease-in forwards;
-    }
-    h2 {
-      margin: 0;
-      font-size: 16px;
-      color: #ffffff;
-    }
-    label {
-      font-size: 12px;
-      color: #cccccc;
-    }
-    input {
-      background: #101010;
-      border: 1px solid #303030;
-      color: #f5f5f5;
-      border-radius: 8px;
-      padding: 9px 10px;
-      outline: none;
-    }
-    input:focus {
-      border-color: #ff5500;
-      box-shadow: 0 0 0 2px rgba(255, 85, 0, 0.25);
-    }
-    button {
-      border: 0;
-      border-radius: 8px;
-      padding: 9px 10px;
-      background: #ff5500;
-      color: #fff;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    #result {
-      flex: 1;
-      background: #0f0f0f;
-      border: 1px solid #2c2c2c;
-      border-radius: 8px;
-      padding: 10px;
-      white-space: pre-wrap;
-      overflow-y: auto;
-      color: #dedede;
-      line-height: 1.4;
-    }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <h2>Genius Lyrics</h2>
-    <label for="artist">Artist Name</label>
-    <input id="artist" type="text" placeholder="Artist Name" autocomplete="off" />
-    <label for="song">Song Name</label>
-    <input id="song" type="text" placeholder="Song Name" autocomplete="off" />
-    <button id="search" type="button">Search</button>
-    <div id="result">Enter artist and song, then search.</div>
-  </div>
-  <script>
-    const { ipcRenderer } = require('electron');
-    const artistInput = document.getElementById('artist');
-    const songInput = document.getElementById('song');
-    const searchButton = document.getElementById('search');
-    const result = document.getElementById('result');
-    const wrap = document.querySelector('.wrap');
-
-    ipcRenderer.on('genius:animate-out', () => {
-      if (!wrap || wrap.classList.contains('slide-out')) return;
-      wrap.classList.add('slide-out');
-      wrap.addEventListener('animationend', () => {
-        ipcRenderer.invoke('genius:close-now');
-      }, { once: true });
-    });
-
-    searchButton.addEventListener('click', async () => {
-      const artist = artistInput.value.trim();
-      const song = songInput.value.trim();
-
-      if (!artist || !song) {
-        result.textContent = 'Please enter both Artist Name and Song Name.';
-        return;
-      }
-
-      result.textContent = 'Searching lyrics...';
-
-      try {
-        const response = await ipcRenderer.invoke('genius:search', { artist, song });
-        if (response && response.ok && response.lyrics) {
-          result.textContent = response.lyrics;
-        } else {
-          result.textContent = 'Lyrics not found';
-        }
-      } catch (error) {
-        result.textContent = 'Lyrics not found';
-      }
-    });
-  </script>
-</body>
-</html>`;
-}
-
-function createGeniusWindow() {
-  if (!win || win.isDestroyed()) return;
-
-  const mainBounds = win.getBounds();
-  const width = 320;
-  const height = 650;
-  const x = Math.round(mainBounds.x);
-  const y = Math.round(mainBounds.y + 40);
-
-  geniusWindow = new BrowserWindow({
-    width,
-    height,
-    x,
-    y,
-    frame: false,
-    transparent: true,
-    resizable: false,
-    minimizable: false,
-    maximizable: false,
-    alwaysOnTop: true,
-    skipTaskbar: true,
-    parent: win,
-    show: false,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false
-    }
-  });
-
-  geniusWindow.loadURL(`data:text/html;charset=UTF-8,${encodeURIComponent(getGeniusWindowHtml())}`);
-  geniusWindow.once('ready-to-show', () => {
-    if (geniusWindow && !geniusWindow.isDestroyed()) {
-      geniusWindow.show();
-      geniusWindow.focus();
-    }
-  });
-
-  geniusWindow.on('closed', () => {
-    geniusWindow = null;
-  });
-}
-
-function toggleGeniusWindow() {
-  if (!geniusWindow || geniusWindow.isDestroyed()) {
-    createGeniusWindow();
-    return;
-  }
-
-  geniusWindow.webContents.send('genius:animate-out');
-}
 
 function startTrackMonitoring() {
   if (trackMonitoringInterval) {
@@ -620,6 +422,247 @@ function startTrackMonitoring() {
   }, 2000);
 }
 
+function getGeniusWindowHtml(trackData) {
+  const displayArtist = (trackData.artist && trackData.artist !== 'Unknown Artist') ? trackData.artist : '';
+  const displayTitle = trackData.title || '';
+  return `<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Genius Lyrics</title>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+    * {
+      box-sizing: border-box;
+      font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+    }
+    body {
+      margin: 0;
+      background: rgba(18, 18, 18, 0.95);
+      color: #f2f2f2;
+      border: 1px solid #2b2b2b;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    @keyframes slideIn {
+      from {
+        transform: translateX(-100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(-100%);
+        opacity: 0;
+      }
+    }
+    .wrap {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 14px;
+      transform: translateX(-100%);
+      opacity: 0;
+      animation: slideIn 0.3s ease-out forwards;
+    }
+    .wrap.slide-out {
+      animation: slideOut 0.22s ease-in forwards;
+    }
+    h2 {
+      margin: 0;
+      font-size: 16px;
+      color: #ffffff;
+    }
+    label {
+      font-size: 12px;
+      color: #cccccc;
+    }
+    input {
+      background: #101010;
+      border: 1px solid #303030;
+      color: #f5f5f5;
+      border-radius: 8px;
+      padding: 9px 10px;
+      outline: none;
+    }
+    input:focus {
+      border-color: #ff5500;
+      box-shadow: 0 0 0 2px rgba(255, 85, 0, 0.25);
+    }
+    .button-row {
+      display: flex;
+      gap: 8px;
+    }
+    button {
+      flex: 1;
+      border: 0;
+      border-radius: 8px;
+      padding: 9px 10px;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    button:hover { opacity: 0.9; }
+    
+    #search { background: #ff5500; }
+    
+    #autofill { 
+      background: #ff7b00; 
+    }
+
+    #result {
+      flex: 1;
+      background: #0f0f0f;
+      border: 1px solid #2c2c2c;
+      border-radius: 8px;
+      padding: 10px;
+      white-space: pre-wrap;
+      overflow-y: auto;
+      color: #dedede;
+      line-height: 1.4;
+      margin-top: 10px;
+    }
+
+    
+  </style>
+</head>
+<body>
+<div class="wrap">
+    <h2>Genius Lyrics</h2>
+    <label for="artist">Artist Name</label>
+    <input id="artist" type="text" placeholder="Artist Name" autocomplete="off" />
+    <label for="song">Song Name</label>
+    <input id="song" type="text" placeholder="Song Name" autocomplete="off" />
+    
+    <div class="button-row">
+      <button id="autofill" type="button">Get Current</button>
+      <button id="search" type="button">Search</button>
+    </div>
+    
+    <div id="result">Enter artist and song, then search.</div>
+  </div>
+  <script>
+    const { ipcRenderer } = require('electron');
+    const artistInput = document.getElementById('artist');
+    const songInput = document.getElementById('song');
+    const searchButton = document.getElementById('search');
+    const autofillButton = document.getElementById('autofill');
+    const result = document.getElementById('result');
+    const wrap = document.querySelector('.wrap');
+
+    ipcRenderer.on('genius:animate-out', () => {
+      if (!wrap || wrap.classList.contains('slide-out')) return;
+      wrap.classList.add('slide-out');
+      wrap.addEventListener('animationend', () => {
+        ipcRenderer.invoke('genius:close-now');
+      }, { once: true });
+    });
+
+    autofillButton.addEventListener('click', async () => {
+      const trackData = await ipcRenderer.invoke('genius:get-track-data');
+      if (trackData) {
+        artistInput.value = (trackData.artist && trackData.artist !== 'Unknown Artist') ? trackData.artist : '';
+        songInput.value = trackData.title || '';
+      }
+    });
+
+    searchButton.addEventListener('click', async () => {
+      const artist = artistInput.value.trim();
+      const song = songInput.value.trim();
+
+      if (!artist || !song) {
+        result.textContent = 'Please enter both Artist Name and Song Name.';
+        return;
+      }
+
+      result.textContent = 'Searching lyrics...';
+
+      try {
+        const response = await ipcRenderer.invoke('genius:search', { artist, song });
+        if (response && response.ok && response.lyrics) {
+          result.textContent = response.lyrics;
+        } else {
+          result.textContent = 'Lyrics not found';
+        }
+      } catch (error) {
+        result.textContent = 'Lyrics not found';
+      }
+    });
+    ipcRenderer.on('genius:animate-out', () => {
+      if (!wrap || wrap.classList.contains('slide-out')) return;
+      wrap.classList.add('slide-out');
+      wrap.addEventListener('animationend', () => {
+        ipcRenderer.invoke('genius:close-now');
+      }, { once: true });
+    });
+  </script>
+</body>
+</html>`;
+}
+
+function createGeniusWindow() {
+  if (!win || win.isDestroyed()) return;
+
+  const mainBounds = win.getBounds();
+  const width = 320;
+  const height = 650;
+  const x = Math.round(mainBounds.x + 10);
+  const y = Math.round(mainBounds.y + 40);
+
+  geniusWindow = new BrowserWindow({
+    width,
+    height,
+    x,
+    y,
+    frame: false,
+    transparent: true,
+    resizable: false,
+    minimizable: false,
+    maximizable: false,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    parent: win,
+    show: false,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    }
+  });
+
+  geniusWindow.loadURL(`data:text/html;charset=UTF-8,${encodeURIComponent(getGeniusWindowHtml(currentTrack))}`);
+  geniusWindow.once('ready-to-show', () => {
+    if (geniusWindow && !geniusWindow.isDestroyed()) {
+      geniusWindow.show();
+      geniusWindow.focus();
+    }
+  });
+
+  geniusWindow.on('closed', () => {
+    geniusWindow = null;
+  });
+}
+
+function toggleGeniusWindow() {
+  if (!geniusWindow || geniusWindow.isDestroyed()) {
+    createGeniusWindow();
+    return;
+  }
+
+  geniusWindow.webContents.send('genius:animate-out');
+}
+
 function injectVolumeBoostHook() {
   const multiplier = store.get('volumeBoost') || 1.0;
 
@@ -661,7 +704,7 @@ function injectVolumeBoostHook() {
         };
       })();
     `)
-    .catch(() => {});
+    .catch(() => { });
 }
 
 function setVolumeBoost(multiplier) {
@@ -675,7 +718,7 @@ function setVolumeBoost(multiplier) {
           if (node && node.gain) node.gain.value = ${multiplier};
         });
       `)
-      .catch(() => {});
+      .catch(() => { });
   }
 
   createTray(win);
@@ -711,7 +754,7 @@ function applyMiniMode() {
     win.setBounds({ width: 400, height: 120 });
     win.setAlwaysOnTop(true);
     view.webContents.insertCSS(MINI_PLAYER_CSS);
-  } catch (err) {}
+  } catch (err) { }
 }
 
 function removeMiniMode() {
@@ -720,7 +763,7 @@ function removeMiniMode() {
     win.setBounds({ width: originalWindowBounds.width, height: originalWindowBounds.height });
     win.setAlwaysOnTop(false);
     view.webContents.insertCSS('::-webkit-scrollbar { display: none; }');
-  } catch (err) {}
+  } catch (err) { }
 }
 
 function toggleMiniMode() {
@@ -741,7 +784,7 @@ async function toggleAutoLaunch() {
       store.set('autoLaunch', true);
     }
     createTray(win);
-  } catch (err) {}
+  } catch (err) { }
 }
 
 function createTray(window) {
@@ -898,7 +941,7 @@ app.whenReady().then(async () => {
     } else if (!storedAutoLaunch && isEnabled) {
       await autoLauncher.disable();
     }
-  } catch (err) {}
+  } catch (err) { }
 });
 
 app.on('window-all-closed', () => {
@@ -926,7 +969,7 @@ function cleanup() {
   if (rpcReconnectTimeout) {
     try {
       clearTimeout(rpcReconnectTimeout);
-    } catch (err) {}
+    } catch (err) { }
     rpcReconnectTimeout = null;
   }
 
@@ -935,11 +978,11 @@ function cleanup() {
 
   if (rpc) {
     Promise.resolve(rpc.clearActivity && rpc.clearActivity())
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => {
         try {
           if (rpc.destroy) rpc.destroy();
-        } catch (err) {}
+        } catch (err) { }
       });
   }
 

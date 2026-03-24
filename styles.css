@@ -34,7 +34,6 @@ body {
   pointer-events: none;
 }
 
-/* Pressed */
 .icon-btn:active img {
   filter: brightness(0.7);
 }
@@ -62,6 +61,10 @@ body {
 
 .genius-btn:active {
   transform: translateY(0);
+}
+
+.genius-btn:active img {
+  filter: brightness(0.7);
 }
 
 #topblock {
