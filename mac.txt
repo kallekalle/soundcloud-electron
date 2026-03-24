@@ -1,0 +1,29 @@
+main.js: + 30 instead of + 40 on the y-offset on the genius window
+const y = Math.round(mainBounds.y + 30);
+
+index.html: genius-button at the beginning instead of the end
+<div id="toolbar">
+      <button id="genius-toggle" class="genius-btn" type="button">
+       <img src="assets/genius2.png"> 
+      </button>
+      <button id="back" class="icon-btn" onclick="window.electronAPI.nav.back()">
+        <img src="assets/backbutton.png">
+      </button>
+      <button id="forward" class="icon-btn" onclick="window.electronAPI.nav.forward()">
+        <img src="assets/forwardbutton.png">
+      </button>
+      <button class="icon-btn" onclick="window.electronAPI.nav.reload()">
+        <img src="assets/refreshbutton.png">
+      </button>
+    </div>
+
+styles.css: margin-left on the toolbar
+#toolbar {
+  display: flex;
+  gap: 8px;
+  padding: 0 10px;
+  margin-left: auto;
+}
+
+package.json: icon.icns instead of icon.ico
+    "icon": "icon.icns"
