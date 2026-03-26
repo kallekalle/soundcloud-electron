@@ -18,6 +18,7 @@
     ]
   },
   "version": "1.0.4",
+  "notes": "Features:/nLyrics integration from Genius/+ various bug fixes, see full release notes ✨",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
