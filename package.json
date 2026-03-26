@@ -18,7 +18,6 @@
     ]
   },
   "version": "1.0.4",
-  "notes": "Lyrics integration from Genius!\n+ various bug fixes, see full release notes ✨",
   "main": "main.js",
   "scripts": {
     "start": "electron .",

@@ -1,6 +1,6 @@
 let view;
 
-const { app, BrowserWindow, BrowserView, Menu, Tray, session, ipcMain, globalShortcut } = require('electron');
+const { app, BrowserWindow, BrowserView, Menu, Tray, session, ipcMain, globalShortcut, dialog, shell } = require('electron');
 const path = require('path');
 const { ElectronBlocker } = require('@cliqz/adblocker-electron');
 const fetch = require('cross-fetch');
@@ -9,6 +9,9 @@ const AutoLaunch = require('auto-launch');
 const axios = require('axios');
 const cheerio = require('cheerio');
 const DiscordRPC = require('discord-rpc');
+const { settings } = require('cluster');
+const { setTimeout } = require('timers');
+const { release } = require('os');
 
 const DISCORD_CLIENT_ID = '1477971683708108854';
 
@@ -35,6 +38,7 @@ let currentTrackName = '';
 const rpc = new DiscordRPC.Client({ transport: 'ipc' });
 let rpcConnected = false;
 let rpcReconnectTimeout = null;
+let updateWindow = null;
 
 app.isQuitting = false;
 
@@ -42,6 +46,33 @@ const gotSingleInstanceLock = app.requestSingleInstanceLock();
 if (!gotSingleInstanceLock) {
   app.quit();
 }
+
+function createUpdateWindow(data) {
+  if (updateWindow) return;
+
+  updateWindow = new BrowserWindow({
+    width: 450,
+    height: 350,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    resizable: false,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    }
+  });
+
+  updateWindow.loadURL(`data:text/html;charset=UTF-8,${encodeURIComponent(getUpdateWindowHtml(data))}`);
+
+  updateWindow.on('closed', () => {
+    updateWindow = null;
+  });
+}
+
+ipcMain.on('update:do-download', () => {
+  shell.openExternal('https://github.com/kallekalle/soundcloud-electron/releases/latest');
+});
 
 function bringMainWindowToFront() {
   if (!win || win.isDestroyed()) return;
@@ -822,6 +853,10 @@ function createTray(window) {
       checked: store.get('autoLaunch'),
       click: toggleAutoLaunch
     },
+    {
+      label: 'Check for Updates...',
+      click: () => { checkForUpdates(true); }
+    },
     { type: 'separator' },
     {
       label: 'Quit',
@@ -925,6 +960,87 @@ ipcMain.handle('genius:search', async (_event, payload) => {
   }
 });
 
+function getUpdateWindowHtml(data) {
+  return `<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    body {
+      margin: 0; background: #121212; color: #f2f2f2;
+      font-family: "Segoe UI", sans-serif; overflow: hidden;
+      border: 1px solid #2b2b2b; border-radius: 12px;
+    }
+    .container {
+      padding: 20px; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box;
+    }
+    h2 { margin: 0 0 10px 0; font-size: 18px; color: #ff5500; }
+    .version-tag { font-size: 12px; color: #888; margin-bottom: 15px; }
+    #notes {
+      flex: 1; background: #1a1a1a; border-radius: 8px; padding: 12px;
+      overflow-y: auto; font-size: 13px; line-height: 1.5; color: #ddd;
+      white-space: pre-wrap; margin-bottom: 20px; border: 1px solid #333;
+    }
+    .btns { display: flex; gap: 10px; justify-content: flex-end; }
+    button {
+      padding: 8px 16px; border-radius: 6px; border: 0; cursor: pointer; font-weight: bold;
+    }
+    .btn-download { background: #ff5500; color: white; }
+    .btn-later { background: #333; color: #ccc; }
+    button:hover { opacity: 0.9; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Update Available!</h2>
+    <div class="version-tag">Version ${data.version} is ready to replace your current version.</div>
+    <div id="notes">${data.notes || 'Bug fixes and performance improvements.'}</div>
+    <div class="btns">
+      <button class="btn-later" onclick="window.close()">Later</button>
+      <button class="btn-download" id="downloadBtn">Download Now</button>
+    </div>
+  </div>
+  <script>
+    const { ipcRenderer } = require('electron');
+    document.getElementById('downloadBtn').onclick = () => {
+      ipcRenderer.send('update:do-download');
+      window.close();
+    };
+  </script>
+</body>
+</html>`;
+}
+
+async function checkForUpdates(isManual = false) {
+  const currentVersion = app.getVersion();
+  const url = 'https://api.github.com/repos/kallekalle/soundcloud-electron/releases/latest';
+
+  try {
+    const response = await axios.get(url);
+    const latestVersionTag = response.data.tag_name;
+    const releaseNotes = response.data.body;
+    const downloadUrl = response.data.html_url;
+    const latestVersion = latestVersionTag.replace('v', '');
+
+    if (latestVersion !== currentVersion) {
+      createUpdateWindow({ version: latestVersion, notes: releaseNotes });
+    } else if (isManual) {
+      dialog.showMessageBox({
+        type: "info",
+        title: "Up to date",
+        message: "You are running the latest version!",
+        detail: `Version ${currentVersion} is the newest available.`
+      });
+    }
+  } catch (error) {
+    if (isManual) {
+      dialog.showErrorBox('Update check failed', 'Could not connect to GitHub');
+    }
+  }
+}
+
 app.whenReady().then(async () => {
   const blocker = await ElectronBlocker.fromPrebuiltAdsAndTracking(fetch);
   blocker.enableBlockingInSession(session.defaultSession);
@@ -942,6 +1058,8 @@ app.whenReady().then(async () => {
       await autoLauncher.disable();
     }
   } catch (err) { }
+
+  setTimeout(checkForUpdates, 3000);
 });
 
 app.on('window-all-closed', () => {
