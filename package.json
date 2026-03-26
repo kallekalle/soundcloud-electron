@@ -12,10 +12,7 @@
     "sign": false,
     "target": "portable",
     "arch": "x64",
-    "icon": [
-      "icon.ico",
-      "icon.icns"
-    ]
+    "icon": "icon.ico"
   },
   "version": "1.0.4",
   "main": "main.js",
