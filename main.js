@@ -1,6 +1,6 @@
 let view;
 
-const { app, BrowserWindow, BrowserView, Menu, Tray, session, ipcMain, globalShortcut, dialog, shell } = require('electron');
+const { app, BrowserWindow, BrowserView, Menu, Tray, session, ipcMain, globalShortcut, dialog, shell, nativeImage } = require('electron');
 const path = require('path');
 const { ElectronBlocker } = require('@cliqz/adblocker-electron');
 const fetch = require('cross-fetch');
@@ -41,6 +41,7 @@ const rpc = new DiscordRPC.Client({ transport: 'ipc' });
 let rpcConnected = false;
 let rpcReconnectTimeout = null;
 let updateWindow = null;
+let thumbarIsPlaying = false;
 
 app.isQuitting = false;
 
@@ -128,7 +129,9 @@ function createWindow() {
 
   view = new BrowserView({
     webPreferences: {
-      contextIsolation: true
+      nodeIntegration: true,
+      contextIsolation: false,
+      preload: path.join(__dirname, 'preload-view.js')
     }
   });
 
@@ -225,11 +228,66 @@ function createWindow() {
 
   createTray(win);
 
+  win.once('ready-to-show', () => {
+    setThumbar(false);
+  });
+
+  // Also set thumbar once the main shell finishes loading
+  win.webContents.once('did-finish-load', () => {
+    setThumbar(false);
+  });
+
+  // IPC from preload-view.js: SoundCloud play button class changed
+  ipcMain.on('thumbar:playback-state', (_event, { isPlaying }) => {
+    if (thumbarIsPlaying !== isPlaying) {
+      thumbarIsPlaying = isPlaying;
+      setThumbar(isPlaying);
+    }
+  });
+
   if (store.get('miniMode')) {
     setTimeout(() => {
       applyMiniMode();
     }, 500);
   }
+}
+
+// ---------------------------------------------------------------------------
+// Taskbar Thumbnail Toolbar (Thumbar)
+// ---------------------------------------------------------------------------
+function setThumbar(isPlaying) {
+  if (!win || win.isDestroyed() || process.platform !== 'win32') return;
+
+  const iconDir = path.join(__dirname, 'assets');
+
+  const imgPrev  = nativeImage.createFromPath(path.join(iconDir, 'prev.png'));
+  const imgPlay  = nativeImage.createFromPath(path.join(iconDir, 'play.png'));
+  const imgPause = nativeImage.createFromPath(path.join(iconDir, 'pause.png'));
+  const imgNext  = nativeImage.createFromPath(path.join(iconDir, 'next.png'));
+
+  win.setThumbarButtons([
+    {
+      tooltip: 'Previous',
+      icon: imgPrev,
+      click() {
+        executeMediaControl(['.skipControl__previous']);
+      }
+    },
+    {
+      tooltip: isPlaying ? 'Pause' : 'Play',
+      icon: isPlaying ? imgPause : imgPlay,
+      click() {
+        executeMediaControl(['.playControls__play', '.playControl']);
+      }
+    },
+    {
+      tooltip: 'Next',
+      icon: imgNext,
+      click() {
+        executeMediaControl(['.skipControl__next']);
+      }
+    }
+  ]);
 }
 
 function executeMediaControl(selectorList) {
@@ -435,6 +493,12 @@ function startTrackMonitoring() {
 
         currentTrack = trackData;
         updateDiscordPresence(trackData);
+
+        // Fallback thumbar sync via polling (catches edge cases the observer misses)
+        if (thumbarIsPlaying !== trackData.isPlaying) {
+          thumbarIsPlaying = trackData.isPlaying;
+          setThumbar(trackData.isPlaying);
+        }
       }
     } catch (err) {
       if (err.message && !err.message.includes('Object has been destroyed')) {
